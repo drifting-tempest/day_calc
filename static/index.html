@@ -1,0 +1,38 @@
+<!DOCTYPE html>
+<html lang = "en">
+
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Days Calculator</title>
+    <link ref="stylesheet" href="static\style.css">
+</head>
+
+<body>
+    <div class="container">
+        <h>Number of Days Between 2 Dates:</h>
+        <p>Enter two dates in the dd/mm/yyyy format to get the number of days between them!</p>
+
+        <form action="/calculate" method="post">
+
+            <div class="input-group">
+                <label for="date1">First Date</label>
+                <input type="text" name="date1" id="date1" placeholder="01/01/2000" required maxlength="10" pattern="\d{2}/\d{2}/\d{4}">
+            </div>
+
+            <div class="input-group">
+                <label for="date2">Second Date</label>
+                <input type="text" name="date2" id="date2" placeholder="01/01/2000" required maxlength="10" pattern="\d{2}/\d{2}/\d{4}">
+            </div>
+
+
+            <button class="submit-btn">
+                <span>Calculate the Days!</span>
+            </button>
+        </form>
+
+        <div id="result"></div>
+
+    </div>    
+</body>
+</html>
