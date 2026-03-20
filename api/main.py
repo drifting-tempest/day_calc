@@ -2,15 +2,25 @@ from fastapi import FastAPI, Form
 from fastapi.responses import HTMLResponse
 from fastapi.staticfiles import StaticFiles
 from fastapi.middleware.cors import CORSMiddleware
-
+import os
 
 app = FastAPI()
-app.add_middleware(CORSMiddleware, allow_origins=["*"], allow_methods=["*"], allow_headers=["*"])
-app.mount("/static", StaticFiles(directory="../static"), name="static")
+app.add_middleware(
+    CORSMiddleware, 
+    allow_origins=["*"], 
+    allow_methods=["*"], 
+    allow_headers=["*"]
+)
+
+base_dir = os.path.dirname(__file__)
+templates_dir = os.path.abspath(os.path.join(base_dir, "..", "templates"))
+static_dir  = os.path.abspath(os.path.join(base_dir, "..", "static"))
+
+app.mount("/static", StaticFiles(directory=static_dir), name="static")
 
 @app.get("/", response_class=HTMLResponse)
 async def home():
-    with open("../static/index.html") as f:
+    with open(os.path.join(templates_dir,"index.html")) as f:
         return f.read()
 
 @app.post("/calculate")
@@ -72,7 +82,9 @@ async def calculate(date1: str = Form(...), date2: str = Form(...)):
     if days_diff < 0:
         days_diff = -days_diff
 
-    with open("../static/index.html") as f:
+    with open(os.path.join(templates_dir, "index.html")) as f:
         html = f.read()
     result_html = f'<div class="result">Days between dates: <strong>{days_diff}</strong></div>'
     return HTMLResponse(content=html.replace('<!-- the result space -->', result_html))
+
+
