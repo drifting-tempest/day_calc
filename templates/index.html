@@ -9,6 +9,9 @@
 </head>
 
 <body>
+
+    <div id="confetti"></div>
+
     <div class="container">
         <h>Number of Days Between 2 Dates:</h>
         <p>Enter two dates in the dd/mm/yyyy format to get the number of days between them!</p>
@@ -31,8 +34,66 @@
             </button>
         </form>
 
-        <div id="result"></div>
+        <div id="result">{{RESULT}}</div>
 
-    </div>    
+    </div> 
+
+    <script>
+        function spawnConfetti() {
+            const confetti = document.getElementById("confetti");
+
+            confetti.classList.add("show");
+            confetti.innerHTML = "";
+
+            const emojis = ["⭐", "✨", "🌟"];
+            const numPieces = 20;
+
+            for (let i = 0; i < numPieces; i++) {
+                const piece = document.createElement("span");
+                piece.classList.add("emoji");
+
+                piece.textContent = emojis[Math.floor(Math.random() * emojis.length)];
+
+                piece.style.left = Math.random() * 100 + "%";
+                const duration = Math.random() * 3 + 2;
+                piece.style.animation = `fall ${duration}s linear forwards`;
+
+                const drift = Math.random() * 200 - 100; 
+                piece.style.setProperty("--drift", drift + "px");
+
+
+                piece.style.left = Math.random() * 100 + "%";
+                piece.style.animation = `fall ${Math.random()*4 + 2}s linear forwards`;
+
+                confetti.appendChild(piece);
+            }
+
+            setTimeout(() => {
+                confetti.classList.remove("show");
+                confetti.innerHTML = "";
+            }, 4000);
+        }
+
+
+        (function () {
+            const resultEl = document.getElementById("result");
+
+            const observer = new MutationObserver(() => {
+                if (resultEl.textContent.trim() !== "") {
+                    spawnConfetti();
+                }
+            });
+
+            observer.observe(resultEl, { childList: true });
+        })();
+
+        window.addEventListener("load", () => {
+            const resultEl = document.getElementById("result");
+            if (resultEl && resultEl.textContent.trim() !== "") {
+                spawnConfetti();
+            }
+        });   
+    </script>
+
 </body>
 </html>
