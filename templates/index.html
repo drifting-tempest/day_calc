@@ -35,64 +35,84 @@
         </form>
 
         <div id="result">{{RESULT}}</div>
-
+        
     </div> 
 
     <script>
-        function spawnConfetti() {
-            const confetti = document.getElementById("confetti");
+        //WHY AM I USING SO MUCH JS FOR CONFETTI OH MY DAYS
 
-            confetti.classList.add("show");
-            confetti.innerHTML = "";
-
-            const emojis = ["⭐", "✨", "🌟"];
-            const numPieces = 20;
-
-            for (let i = 0; i < numPieces; i++) {
-                const piece = document.createElement("span");
-                piece.classList.add("emoji");
-
-                piece.textContent = emojis[Math.floor(Math.random() * emojis.length)];
-
-                piece.style.left = Math.random() * 100 + "%";
-                const duration = Math.random() * 3 + 2;
-                piece.style.animation = `fall ${duration}s linear forwards`;
-
-                const drift = Math.random() * 200 - 100; 
-                piece.style.setProperty("--drift", drift + "px");
-
-
-                piece.style.left = Math.random() * 100 + "%";
-                piece.style.animation = `fall ${Math.random()*4 + 2}s linear forwards`;
-
-                confetti.appendChild(piece);
+        function launchConfetti() {
+            let canvas = document.getElementById("confetti-canvas");
+            if(!canvas) {
+                canvas = document.createElement("canvas")
+                canvas.id = "confetti-canvas";
+                canvas.style.cssText = "position:fixed;top:0;left:0;width:100vw;height:100vh;z-index:99999;pointer-events:none;"
+                document.body.appendChild(canvas)
             }
 
-            setTimeout(() => {
-                confetti.classList.remove("show");
-                confetti.innerHTML = "";
-            }, 4000);
+            const ctx = canvas.getContext("2d");
+            canvas.width = window.innerWidth;
+            canvas.height = window.innerHeight;
+
+            const confetti = [];
+            const colors = ["#d7fff1", "#aafcb8", "#8cd790", "#77af9c", "#285943", "#4adbc5", "#6ee7b7", "#3aa97a", "#2b8b5f"];
+
+            for (let i = 0; i < 100; i++) {
+                confetti.push({
+                    x: Math.random() * canvas.width,
+                    y: -10,
+                    w: Math.random() * 8 + 4,
+                    h: Math.random() * 12 + 6,
+                    c: colors[Math.floor(Math.random() * colors.length)],
+                    vx: (Math.random() - 0.5) * 4,
+                    vy: Math.random() * 3 + 2,
+                    rot: Math.random() * 360,
+                    spin: Math.random() * 10 + 5
+                });
+            }
+
+            function animate() {
+                ctx.clearRect(0, 0, canvas.width, canvas.height);
+
+                confetti.forEach((p, i) => {
+                    p.x += p.vx;
+                    p.y += p.vy;
+                    p.vy += 0.1; 
+                    p.rot += p.spin //spent so much time on this logic stuff, i thought rot meant brainrot
+
+                    ctx.save();
+                    ctx.translate(p.x,p.y);
+                    ctx.rotate(p.rot*Math.PI/180);
+                    ctx.fillStyle = p.c;
+
+                    ctx.fillRect(-p.w/2, -p.h/2, p.w, p.h); 
+                    ctx.restore();
+
+                    if (p.y > canvas.height+20) {
+                        confetti.splice(i, 1);
+                    }
+                });
+
+                if (confetti.length > 0) {
+                    requestAnimationFrame(animate);
+                }
+                else {
+                    canvas.remove();
+                }
+             }
+
+             animate();
         }
 
-
-        (function () {
-            const resultEl = document.getElementById("result");
-
-            const observer = new MutationObserver(() => {
-                if (resultEl.textContent.trim() !== "") {
-                    spawnConfetti();
-                }
-            });
-
-            observer.observe(resultEl, { childList: true });
-        })();
-
-        window.addEventListener("load", () => {
-            const resultEl = document.getElementById("result");
-            if (resultEl && resultEl.textContent.trim() !== "") {
-                spawnConfetti();
+        const resultE1 = document.getElementById("result");
+        function checkResult() {
+            if (resultE1.textContent.includes("Days between dates")) {
+                launchConfetti();
             }
-        });   
+        }
+
+        checkResult();
+        new MutationObserver(checkResult).observe(resultE1, {childList: true, subtree: true});
     </script>
 
 </body>
